@@ -59,25 +59,102 @@
 ## 🛠 StepFunction Flow
 <img width="349" alt="stepfunction flow" src="https://github.com/user-attachments/assets/af3c839c-602f-4aac-a89b-3990a0e5c0cc">
 
-## 🎯 Key Code Explanations
-- 설명은 주석처리 해두었습니다. 
-- Lambda #1
-    -
-    ```python
-    
-    ```
+## 🎯 Lambda Explanations
+> **StepFunction 내 Lambda 별 기능 및 Input/Output**
 
-- Lambda #2
-    -
-    ```python
-    
-    ```
+|   | Lambda(1) | Lambda(2) | Lambda(3) |
+|---|-----------|-----------|-----------|
+| **목적** | 유저리스트 n개씩 가져옴 | payload를 큐로 n개씩 전송 | SQS에서 SES로 이메일 전송 |
+| **Input** | 유저리스트 chunk (크기: n개) (DynamoDB에서 유저 데이터 몇 개 읽어올 지) | 유저리스트 데이터 (DynamoDB에서 꺼내온 정보) | 유저 payload 리스트 n개 배치 |
+| **Output** | 1. 유저리스트 chunk (DynamoDB에서 꺼내온 정보 = name, email, gender, isscribing) 2. 템플릿 정보 | 유저 payload 리스트 n개 배치 (name, email, subject, body) | 메일 완성본 (템플릿에 유저 payload 삽입 + 구독취소링크 삽입 + S3에서 가져온 이미지 삽입) |
 
-- Lambda #3
-    -
-    ```python
-    
-    ```
+
+
+-Lambda #1
+  -
+  <strong>Output</strong>
+  ```
+{
+  "result": {
+    "Payload": [
+      {
+        "Gender": "Male",
+        "SubscriptionStatus": true,
+        "Email": "jiwonkim0810@gmail.com",
+	      "Name": "chulsu"
+      },
+      
+        .
+        .      (생략)
+        .
+      
+      
+      {
+        "Gender": "Female",
+        "SubscriptionStatus": "true",
+        "Email": "yuripark066@gmail.com",
+        "Name": "Karen Young"
+      },
+    ],
+    "LastEvaluatedKey": {
+      "Email": "yuripark066@gmail.com"
+    } 
+  }
+  ```
+  ```json
+- 10개의 유저데이터 output은 map#1~map#10에 해당
+- 들고 온 마지막 데이터를 LastEvaluatedKey 로 저장
+  ```
+
+-Lambda #2
+  -
+<table>
+  <tr>
+    <td><strong>Input</strong></td>
+    <td><strong>Output</strong></td>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+{
+  "Gender": "Female",
+  "SubscriptionStatus": "true",
+  "Email": "jiwonkim0810@gmail.com",
+  "Name": "chulsu"
+}
+      </pre></br></br></br></br></br></br></br></br><blockquote>
+    </td>
+    <td>
+      <pre>
+{
+  "statusCode": 200, "body": { "template": { "subject": "환영합니다!", "body": "<!DOCTYPE html><html lang=\"ko\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>{{Subject}}</title></head><body><p>안녕하세요, {{Name}}님!</p><p>{{Body}}</p><p><a href=\"https://www.musinsa.com\">지금 쇼핑하기</a></p><p>감사합니다,<br>무신사 팀</p><p>이 메일은 무신사에서 발송되었습니다. 수신 거부를 원하시면 <a href=\"#\">여기</a>를 클릭하세요.</p></body></html>" }, 
+  "user": {
+     "Email": "jiwonkim0810@gmail.com",
+      "Name": "chulsu",
+      "Subject": "무신사 파격세일", 
+      "Body": "들어가는 말" } }
+}
+      </pre>
+    </td>
+  </tr>
+</table>
+
+```json
+- Lambda(2)의 위 포멧은 map#1만을 의미 
+- Step Functions의 Map 특성상, 나머지 map#2~map#10도 병렬 처리되고 있음
+    → SES에 저장해 둔 템플릿을 가져와 Lambda(3)로 옮김
+    → Lambda(3)로 이동 전 SQS 거침
+  ```
+
+
+
+-Lambda #3
+  -
+  ```json
+  - 메일 완성본을 SES로 전달
+     -> S3으로부터 이미지 삽입
+     -> 구독 취소 링크 삽입
+  ```
 
 - StepFunction
     -
