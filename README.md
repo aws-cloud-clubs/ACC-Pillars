@@ -101,7 +101,7 @@
     } 
   }
   ```
-  ```json
+  ```
 - 10개의 유저데이터 output은 map#1~map#10에 해당
 - 들고 온 마지막 데이터를 LastEvaluatedKey 로 저장
   ```
@@ -139,7 +139,7 @@
   </tr>
 </table>
 
-```json
+```
 - Lambda(2)의 위 포멧은 map#1만을 의미 
 - Step Functions의 Map 특성상, 나머지 map#2~map#10도 병렬 처리되고 있음
     → SES에 저장해 둔 템플릿을 가져와 Lambda(3)로 옮김
@@ -150,7 +150,7 @@
 
 -Lambda #3
   -
-  ```json
+  ```
   - 메일 완성본을 SES로 전달
      -> S3으로부터 이미지 삽입
      -> 구독 취소 링크 삽입
