@@ -70,7 +70,7 @@
 
 
 
--Lambda #1
+-Lambda #1 - GetUserData
   -
   <strong>Output</strong>
   ```
@@ -106,7 +106,7 @@
 - 들고 온 마지막 데이터를 LastEvaluatedKey 로 저장
   ```
 
--Lambda #2
+-Lambda #2 - EmailQueuer
   -
 <table>
   <tr>
@@ -148,7 +148,7 @@
 
 
 
--Lambda #3
+-Lambda #3 - EmailPayload
   -
   ```
   - 메일 완성본을 SES로 전달
