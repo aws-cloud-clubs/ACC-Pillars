@@ -66,7 +66,12 @@
 
 ## **🛠 Structure Diagram Explanations**
 ![emailprocess](https://github.com/user-attachments/assets/749e3e6f-7297-47dd-aa63-caf2bec8e570)
-
+- 실제 이메일은 sandbox를 해제하지 않는 이상 AWS 계정당 메일 200개만을 보낼 수 있기에, 실행 예시는 200개를 기준으로 함
+- DynamoDB에 있는 전체 유저 200명에게 이메일을 보낸다고 가정
+- Lambda(1)에서 dynamoDB로부터 10명의 유저 정보를 가져옴
+- 그 후 Lambda(2)를 호출해 10명의 유저 payload와 템플릿 정보를 SQS로 전달 (*SQS를 거치는 이유는 이메일 누락을 막기 위함)
+- Lambda(3)에서 10명의 유저 payload를 가져와 템플릿에 삽입하여 이메일을 완성한 후, SES로 이메일을 전송
+- 200개의 이메일을 전송하기 위해 이런 과정을 20번 반복(10*20 = 200개의 이메일)
 
 ## **🛠 StepFunction Map Flow**
 <img width="349" alt="stepfunction flow" src="https://github.com/user-attachments/assets/af3c839c-602f-4aac-a89b-3990a0e5c0cc">
