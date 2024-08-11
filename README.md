@@ -262,6 +262,18 @@
       }
     }   
      ```
+## 🔗 Step Functions Efficiency
+<img width="1000" alt="st0" src="https://github.com/user-attachments/assets/d2cbfa3b-6d81-4cef-82cc-1bab1f1396ae">
+<img width="1000" alt="step2" src="https://github.com/user-attachments/assets/eef1f1b5-d6d4-498c-8de7-d699e6b7b449">
+<img width="1000" alt="step3" src="https://github.com/user-attachments/assets/736dda4f-fdcf-4541-b2a9-a8a8c8b40553">
+
+- 50개의 이메일을 보내는데 총 21초 걸림
+- 이를 평균으로 계산하면 5분 동안 보낼 수 있는 이메일의 개수는 750개
+
+## 🔗 development direction
+<img width="985" alt="error" src="https://github.com/user-attachments/assets/15d94b1a-46fb-4840-be93-7a70aca668ea">
+
+- Lambda 함수에서 SES에 미리 올려놓은 템플릿을 가져오는 코드에서 너무 많은 API 요청으로 인해 Throttling이 발생 → 이를 해결하기 위해 처음에만 SES에서 템플릿을 가져와서 ElastiCache에 넣어 사용하는 형식으로 위의 문제를 해결하고자 함
 
 ## 🛠 DynamoDB 설계
 ### [User Table]
