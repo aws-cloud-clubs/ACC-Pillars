@@ -67,6 +67,24 @@
 ## **🛠 StepFunction Map Flow**
 <img width="349" alt="stepfunction flow" src="https://github.com/user-attachments/assets/af3c839c-602f-4aac-a89b-3990a0e5c0cc">
 
+## AWS SES
+> **AWS SES(Amazon Simple Email Service)**는 대량으로 이메일을 전송할 수 있는 클라우드 이메일 서비스 공급자입니다. 
+
+- **비용 효율성**: 사용한 만큼만 비용을 지불하여 경제적입니다.
+- **자동 스케일링**: 이메일 발송 크기가 자동으로 스케일링되어 유연하게 대응할 수 있습니다.
+- **상세한 로그와 보고서**: 전송된 이메일에 대한 상세한 로그와 보고서를 제공하여, 다른 서비스의 기준값으로 활용할 수 있습니다.
+
+### 도메인 & 이메일 주소 인증
+- **도메인 구매**: 가비아에서 도메인을 구매하여 사용합니다.
+- **DKIM 인증**: SES에서 제공하는 **DKIM(DomainKeys Identified Mail)**의 CNAME 레코드를 가비아의 도메인 DNS 설정에 추가합니다.
+
+    > **목적**: 이메일 전송 시, 도메인이 실제로 내 것임을 증명하고, 이메일이 스팸으로 분류되는 것을 방지합니다.
+    
+<img width="700" alt="자격 증명" src="https://github.com/user-attachments/assets/d1bcea0b-d100-4804-a3b6-34768acf2e64">
+    
+
+
+
 ## 🎯 **Lambda Explanations**
 > **StepFunction 내 Lambda 별 기능 및 Input/Output**
 
