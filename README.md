@@ -64,21 +64,25 @@
 ## **🛠 Overall Project Structure Diagram**
 <img width="914" alt="AWS 구조도" src="https://github.com/user-attachments/assets/f7638310-3dc0-4970-a5f5-7b0f71334790">
 
+## **🛠 Structure Diagram Explanations**
+![emailprocess](https://github.com/user-attachments/assets/749e3e6f-7297-47dd-aa63-caf2bec8e570)
+
+
 ## **🛠 StepFunction Map Flow**
 <img width="349" alt="stepfunction flow" src="https://github.com/user-attachments/assets/af3c839c-602f-4aac-a89b-3990a0e5c0cc">
 
-## AWS SES
-> **AWS SES(Amazon Simple Email Service)**는 대량으로 이메일을 전송할 수 있는 클라우드 이메일 서비스 공급자입니다. 
+## 🛠 AWS SES
+> AWS SES(Amazon Simple Email Service)는 대량으로 이메일을 전송할 수 있는 클라우드 이메일 서비스 공급자
 
-- **비용 효율성**: 사용한 만큼만 비용을 지불하여 경제적입니다.
-- **자동 스케일링**: 이메일 발송 크기가 자동으로 스케일링되어 유연하게 대응할 수 있습니다.
-- **상세한 로그와 보고서**: 전송된 이메일에 대한 상세한 로그와 보고서를 제공하여, 다른 서비스의 기준값으로 활용할 수 있습니다.
+- **비용 효율성**: 사용한 만큼만 비용을 지불하여 경제적
+- **자동 스케일링**: 이메일 발송 크기가 자동으로 스케일링되어 유연하게 대응
+- **상세한 로그와 보고서**: 전송된 이메일에 대한 상세한 로그와 보고서를 제공하여, 다른 서비스의 기준값으로 활용 가능
 
 ### 도메인 & 이메일 주소 인증
-- **도메인 구매**: 가비아에서 도메인을 구매하여 사용합니다.
-- **DKIM 인증**: SES에서 제공하는 **DKIM(DomainKeys Identified Mail)**의 CNAME 레코드를 가비아의 도메인 DNS 설정에 추가합니다.
+- **도메인 구매**: 가비아에서 도메인을 구매하여 사용
+- **DKIM 인증**: SES에서 제공하는 **DKIM(DomainKeys Identified Mail)**의 CNAME 레코드를 가비아의 도메인 DNS 설정에 추가
 
-    > **목적**: 이메일 전송 시, 도메인이 실제로 내 것임을 증명하고, 이메일이 스팸으로 분류되는 것을 방지합니다.
+    > **목적**: 이메일 전송 시, 도메인이 실제로 내 것임을 증명하고, 이메일이 스팸으로 분류되는 것을 방지
     
 <img width="700" alt="자격 증명" src="https://github.com/user-attachments/assets/d1bcea0b-d100-4804-a3b6-34768acf2e64">
     
@@ -182,9 +186,9 @@
      -> 구독 취소 링크 삽입
   ```
 
-- StepFunction
-    -
-    ```python
+-StepFunction
+ -
+  ```python
     {
       "StartAt": "Lambda (1)",
       "States": {
@@ -261,7 +265,8 @@
         }
       }
     }   
-     ```
+```
+
 ## 🔗 Step Functions Efficiency
 <img width="1000" alt="st0" src="https://github.com/user-attachments/assets/d2cbfa3b-6d81-4cef-82cc-1bab1f1396ae">
 <img width="1000" alt="step2" src="https://github.com/user-attachments/assets/eef1f1b5-d6d4-498c-8de7-d699e6b7b449">
@@ -279,11 +284,11 @@
 ### [User Table]
 - 유저 정보를 저장하기 위한 테이블
 
-**Partition key**
+> **Partition key**
 - Email(String)
     - 유저 이메일 주소를 저장하기 위해 사용
 
-**Attributes**
+> **Attributes**
 - Name(String)
     - 유저 이름을 저장하기 위해 사용
 - Gender(String)
@@ -296,11 +301,11 @@
 ### [ImageAndTemplate Table]
 - 이메일 템플릿과 사용하는 이미지들의 메타데이터를 저장하기 위한 테이블
 
-**Partition key**
+> **Partition key**
 - TemplateID(String)
     - 이메일 템플릿을 고유하게 식별할 TemplateID
 
-**Attributes**
+> **Attributes**
 - ImageURLs(List)
     - 해당 템플릿이랑 매핑후, s3에 저장된 해당 이미지 주소
 - TemplateName(String)
@@ -308,10 +313,11 @@
 
 
 
+
 ## 📩 이메일 발송을 위한 유저 정보 처리
 
 ### 초기에 서비스 운영 DB에서 유저 데이터 가져오기
-서비스 운영 DB로 관계형 데이터베이스를 사용하고 있다고 가정하고, 이메일 대량 발송을 위해서는 이메일 보낼 유저의 정보(이름, 이메일, 성별 등)를 관계형 데이터베이스에서 가져와야 합니다.
+서비스 운영 DB로 관계형 데이터베이스를 사용하고 있다고 가정하고, 이메일 대량 발송을 위해서는 이메일 보낼 유저의 정보(이름, 이메일, 성별 등)를 관계형 데이터베이스에서 가져
 
 다른 테이블과의 join 작업이 필요하지 않기 때문에 매번 운영 DB에 접속하여 메일을 발송할 유저 정보를 읽어오기 보다는 빠른 Read 작업이 가능한 DynamoDB에 유저 정보를 두고, 메일을 발송할 때 DynamoDB에서 유저 정보를 가져오는 방법이 낫다고 판단하였습니다. 또 주기적으로 운영 DB에서 변동된 유저 정보를 DynamoDB에 업데이트함으로써 데이터를 동일하게 유지합니다.
 
@@ -330,13 +336,6 @@ _* 운영 DB가 RDS에서 MySQL DB를 활용하고 있다고 가정합니다.
 3. **변경된 데이터 추적**: MySQL의 `TIMESTAMP` 타입을 이용하면 데이터가 추가 및 수정될 때 자동으로 `TIMESTAMP` 필드가 업데이트 됩니다. 유저 테이블의 `update_at` 필드를 `TIMESTAMP` 타입으로 설정하여 변경된 데이터를 추적합니다.
 4. **데이터 동기화**: 변경된 데이터를 읽어와 DynamoDB에 반영합니다. 이후에도 주기적으로 2~4번 과정이 실행됩니다.
 
-
-
-## 🔗 기술 블로그 링크
-
-
-
-## 🔗 최종 보고서 링크
 
 
 
