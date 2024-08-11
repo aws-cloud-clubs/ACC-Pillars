@@ -161,6 +161,43 @@
     ```python
     
     ```
+
+## 🛠 DynamoDB 설계
+### [User Table]
+- 유저 정보를 저장하기 위한 테이블
+
+**Partition key**
+- Email(String)
+    - 유저 이메일 주소를 저장하기 위해 사용
+
+**Attributes**
+- Name(String)
+    - 유저 이름을 저장하기 위해 사용
+- Gender(String)
+    - 해당 유저의 성별을 저장
+- CreateTime(숫자)
+    - 회원가입 시간 저장
+- SubscriptionStatus(부울)
+    - 구독 상태를 저장
+
+### [ImageAndTemplate Table]
+- 이메일 템플릿과 사용하는 이미지들의 메타데이터를 저장하기 위한 테이블
+
+**Partition key**
+- TemplateID(String)
+    - 이메일 템플릿을 고유하게 식별할 TemplateID
+
+**Attributes**
+- ImageURLs(List)
+    - 해당 템플릿이랑 매핑후, s3에 저장된 해당 이미지 주소
+- TemplateName(String)
+    - 이메일 템플릿 사용 용도를 간략하게 저장하기 위한 용도
+
+
+
+
+
+
 ## 🔗 기술 블로그 링크
 
 
