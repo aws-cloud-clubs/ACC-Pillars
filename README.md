@@ -44,22 +44,30 @@
 </div>
 
 
-## ❔ AWS Services Usage Explanations 
-- StepFunction
-- Email Verification(sandbox)
-- Lambda
-- DynamoDB
+## ❔ **AWS Services Usage Explanations** 
+> **Lambda**
+  - 15분의 Lambda 실행 시간의 제약 발생
+  - but, Serverless 환경의 장점을 사용하고 싶음
+  - StepFunction 도입
+> **StepFunction**
+  
+  - Map을 사용해 동일한 워크플로우(예: Lambda 함수 호출)를 병렬로 실행
+  - 전체 실행시간을 단축 & 복잡한 반복 로직을 간결하게 처리 
+  - 이메일이 늘어날수록 처리속도 상승
+> **Email Verification(sandbox)**
+-
+> **DynamoDB**
 
 
 
 
-## 🛠 Overall Project Structure Diagram
+## **🛠 Overall Project Structure Diagram**
 <img width="914" alt="AWS 구조도" src="https://github.com/user-attachments/assets/f7638310-3dc0-4970-a5f5-7b0f71334790">
 
-## 🛠 StepFunction Flow
+## **🛠 StepFunction Map Flow**
 <img width="349" alt="stepfunction flow" src="https://github.com/user-attachments/assets/af3c839c-602f-4aac-a89b-3990a0e5c0cc">
 
-## 🎯 Lambda Explanations
+## 🎯 **Lambda Explanations**
 > **StepFunction 내 Lambda 별 기능 및 Input/Output**
 
 |   | Lambda(1) | Lambda(2) | Lambda(3) |
@@ -70,7 +78,7 @@
 
 
 
--Lambda #1 - GetUserData
+-Lambda (1) - GetUserData
   -
   <strong>Output</strong>
   ```
@@ -106,7 +114,7 @@
 - 들고 온 마지막 데이터를 LastEvaluatedKey 로 저장
   ```
 
--Lambda #2 - EmailQueuer
+-Lambda (2) - EmailQueuer
   -
 <table>
   <tr>
@@ -148,7 +156,7 @@
 
 
 
--Lambda #3 - EmailPayload
+-Lambda (3) - EmailPayload
   -
   ```
   - 메일 완성본을 SES로 전달
@@ -159,8 +167,83 @@
 - StepFunction
     -
     ```python
-    
-    ```
+    {
+      "StartAt": "Lambda (1)",
+      "States": {
+        "Lambda (1)": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:ap-northeast-2:008971651769:function:GetUserData10",
+          "ResultPath": "$.result",
+          "Next": "Map"
+        },
+        "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.result.Payload",
+          "MaxConcurrency": 10,
+          "ItemProcessor": {
+            "ProcessorConfig": {
+              "Mode": "INLINE"
+            },
+            "StartAt": "Lambda(2)",
+            "States": {
+              "Lambda(2)": {
+                "Type": "Task",
+                "Resource": "arn:aws:lambda:ap-northeast-2:008971651769:function:EmailQueuer_update",
+                "Next": "Lambda (3)"
+              },
+              "Lambda (3)": {
+                "Type": "Task",
+                "Resource": "arn:aws:states:::lambda:invoke",
+                "OutputPath": "$.Payload",
+                "Parameters": {
+                  "Payload.$": "$",
+                  "FunctionName": "arn:aws:lambda:ap-northeast-2:008971651769:function:email_pra"
+                },
+                "Retry": [
+                  {
+                    "ErrorEquals": [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                  }
+                ],
+                "End": true
+              }
+            }
+          },
+          "Next": "CheckForMoreData",
+          "ResultPath": "$.results_test"
+        },
+        "CheckForMoreData": {
+          "Type": "Choice",
+          "Choices": [
+            {
+              "Variable": "$.result.LastEvaluatedKey",
+              "IsPresent": true,
+              "Next": "UpdateLastEvaluatedKey"
+            }
+          ],
+          "Default": "Finish"
+        },
+        "UpdateLastEvaluatedKey": {
+          "Type": "Pass",
+          "Parameters": {
+            "LastEvaluatedKey.$": "$.result.LastEvaluatedKey"
+          },
+          "ResultPath": "$.meta",
+          "Next": "Lambda (1)"
+        },
+        "Finish": {
+          "Type": "Succeed"
+        }
+      }
+    }   
+     ```
 
 ## 🛠 DynamoDB 설계
 ### [User Table]
